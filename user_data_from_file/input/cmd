@@ -1,0 +1,14 @@
+# Generate hex files with 4 Byte data in one line
+# Lesser lines smaller the file size in comparison with 1 Byte lines
+od -t x4z -w4 file.txt > file_4B.hex
+
+# Generate hex files with 8 Byte data in one line
+# Lesser lines smaller the file size
+od -t x8z -w8 file.txt > file_8B.hex
+
+
+# Generate ASCII file with 4 Hex Byte in one line
+cat file_4B.hex.out | sed -r 's/(..)(..)(..)(..)/\4\3\2\1/' | xxd -r -p
+
+# Generate ASCII file with 8 Hex Byte in one line
+cat file_8B.hex.out | sed -r 's/(..)(..)(..)(..)(..)(..)(..)(..)/\8\7\6\5\4\3\2\1/' | xxd -r -p
