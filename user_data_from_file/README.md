@@ -45,7 +45,7 @@ function to return a byte array Queue. The number of bytes to be reutruned is gi
 ### print_array_hex
 function to print array in hex. Pass the array and a string identifier as parameter.
 
-### print_array_ascii
+### print_arra_ascii
 function to print array in ACSII. Pass the array and a string identifier as parameter.
 
 
@@ -79,4 +79,20 @@ Below code has the complete use model
         sd_B.store_received_data(payload);
         sd_B.print_array_hex(sd_B.receive_data, "Received Data");
      end
+```
+
+## Simulation
+Experimental run requires VCS and can be done by executing below commands
+
+```csh
+cd run
+make all
+```
+
+### To view the received Text file
+Simulation will also generate the output hex file in the `input` folder. Run the below command to view the Text file
+ 
+```csh
+cd user_data_from_file/input
+cat file_8B.hex.out | sed -r 's/(..)(..)(..)(..)(..)(..)(..)(..)/\8\7\6\5\4\3\2\1/' | xxd -r -p
 ```
