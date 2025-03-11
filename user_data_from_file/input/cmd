@@ -1,6 +1,10 @@
 # Generate hex files with 4 Byte data in one line
 # Lesser lines smaller the file size in comparison with 1 Byte lines
 xxd -g 4 -c 4 -e file.txt > file_4B.hex
+# Appened after 6 additional byte offsets from the previous completion 0x59 in the hex file
+xxd -g 4 -c 4 -e -o 0x60 file.txt >> file_4B.hex
+# Appened at exact byte offset, after the previous completion at 0xb9 in the hex file
+xxd -g 4 -c 4 -e -o 0xba file.txt >> file_4B.hex
 
 # Generate hex files with 8 Byte data in one line
 # Lesser lines smaller the file size

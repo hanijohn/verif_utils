@@ -8,12 +8,12 @@ An example of "Hello World" message passed through design can be found in the 'i
 ### Convert Text to hex file - 4 Byte data in one line
 Lesser lines smaller the file size in comparison with 1 Byte lines
 ```csh
-od -t x4z -w4 file.txt > file_4B.hex
+xxd -g 4 -c 4 -e file.txt > file_4B.hex
 ```
 
 ### Convert Text to hex file - 8 Byte data in one line
 ```csh
-od -t x8z -w8 file.txt > file_8B.hex
+xxd -g 8 -c 8 -e file.txt > file_8B.hex
 ```
 
 ### Generate ASCII file with 4 Hex Byte
@@ -26,6 +26,14 @@ cat file_4B.hex.out | sed -r 's/(..)(..)(..)(..)/\4\3\2\1/' | xxd -r -p
 cat file_8B.hex.out | sed -r 's/(..)(..)(..)(..)(..)(..)(..)(..)/\8\7\6\5\4\3\2\1/' | xxd -r -p
 ```
 
+## Hex File Format
+`byte offset`: `data` `can be anything`
+```text
+00000000: 6c6c6548  Hell
+00000004: 6f57206f  o Wo
+00000008: 0a646c72  rld.
+```
+
 ## Systemverilog API
 Systemverilog implementation is encapsulated in class ```stimulus_file. The hex file needs be passed while constructing along with few other parameters, complete list below
 
@@ -36,10 +44,14 @@ Mandatory parameter hex file name and other optional arguments
 - data_char_position : default 8 | coloumn position of start of data charater in hex file
 - bytes : default 4 | Byte length of each line in the nex file
 - single_read_lines : default 100 | Number of lines read from the hex file. Used to optimize memory usage. Avoids creating big storage for large sized files.
+- little_endian          : Toggle this to swap endianness
+- skip_endianness_conversion : Skips endiannesss conversion to avoid warning message
 
 
 ### get_input_byte_stream
 function to return a byte array Queue. The number of bytes to be reutruned is given as parameter.
+If the hex file has gaps in the byte offset, byte array will be padded with 0s in the gap : example case in file_4B.hex as created using the `cmd` file.
+If the hex file has byte offset not aligned to the byte length, the previous lines data byte must have got padded to 0s and these will be removed : example case in file_4B.hex
 
 
 ### print_array_hex

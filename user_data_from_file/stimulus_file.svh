@@ -138,11 +138,13 @@ class stimulus_file#(type T=bit[7:0]);
    // data_pos : Start character position of line
    // byte_len : Number of characters to be read will by 2*byte_len
    // -----------------------------------------------------------------------------------------------
-   function byte_ar_t extract_byte(int fh);
+   function byte_ar_t extract_byte(int fh, ref int modify_bytes);
       int          code;
       string       line;
       string       s;
       byte_ar_t    data;
+      static int   prev_byte_offset;
+      int          byte_offset;
 
       code = $fgets(line, fh);
       // skip lines if provided
@@ -156,8 +158,24 @@ class stimulus_file#(type T=bit[7:0]);
 
       // Found data bytes in the line
       for(int i=0; i<byte_len; i++) begin
-        data.push_back(s.substr(i*2,i*2+1).atohex()); 
+         data.push_back(s.substr(i*2,i*2+1).atohex()); 
       end
+
+      // Check the byte offest and 
+      // remove previous bytes : negative modify_bytes
+      // or add bytes to the send_data : positive modify_bytes
+      byte_offset = line.substr(0, 7).atohex;
+      if (byte_offset > 0 && (byte_offset - prev_byte_offset) != byte_len) begin
+         if ((byte_offset - prev_byte_offset) > byte_len) begin
+            modify_bytes = (byte_offset - prev_byte_offset) - byte_len;
+         end else begin
+            modify_bytes =  - (byte_len - (byte_offset - prev_byte_offset));
+         end
+         $display("modify bytes %d | byte_offset %x | prev_byte_offset %x", modify_bytes, byte_offset, prev_byte_offset);
+      end
+
+      prev_byte_offset = byte_offset;
+ 
 
       // Endianess
       if (convert_endian) begin
@@ -169,6 +187,32 @@ class stimulus_file#(type T=bit[7:0]);
       return(data);
    endfunction
 
+   // -----------------------------------------------------------------------------------------------
+   // get_data_bytes is a wrapper around extract_bytes, to handle modification of data array
+   // If the byte offset in the hex file is more, the array is padded with zeroes
+   // If the byte offset is less than the byte length, entries are removed (0s) are removed from the array
+   // -----------------------------------------------------------------------------------------------
+   function void get_data_bytes(int fh, ref byte_ar_t data);
+      int          modify_bytes;
+      byte_ar_t    new_data;
+
+      new_data = extract_byte(fh, modify_bytes);
+      if (modify_bytes > 0) begin
+         repeat(modify_bytes) begin
+            data.push_back(0);
+         end
+      end
+      if (modify_bytes < 0) begin
+         repeat(-modify_bytes) begin
+            bit [7:0] data_byte;
+            data_byte = data.pop_back();
+            if (data_byte != 0) begin
+               $display("Warning !! Potential data loss. removing bytes %02x", data_byte);
+            end
+         end
+      end
+      data = {data, new_data};
+   endfunction
 
    // -----------------------------------------------------------------------------------------------
    // Read input data file, which is in hex format
@@ -189,7 +233,7 @@ class stimulus_file#(type T=bit[7:0]);
       $display("read_file : lines %d : fh_pos %d", lines, fh_pos);
       if (!lines) begin
          while (!$feof(fh)) begin
-            data = {data, extract_byte(fh)};
+            get_data_bytes(fh, data);
          end
          $display("End of File: no more data");
          file_empty = 1;
@@ -207,7 +251,7 @@ class stimulus_file#(type T=bit[7:0]);
                file_empty = 1;
                break;
             end
-            data = {data, extract_byte(fh)};
+            get_data_bytes(fh, data);
             ++num;
          end
          began = 1;
