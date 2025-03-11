@@ -33,21 +33,28 @@ class stimulus_file#(type T=bit[7:0]);
    int             data_pos;                          // Data position in file
    int             byte_len;                          // Number of Bytes in file
    int             page_size;                         // Number of lines read from file in one go
+   bit             endian;                            // 0 : little endian | 1 : big endian
+   bit             convert_endian;                    // invokes conversion only when set
+   int             byte_offset;
 
 
    // -----------------------------------------------------------------------------------------------
    // Constructor:
    // skip_lines             : skip lines from top of the file
-   // data_char_position     : position of the data character in the line
+   // data_char_position     : position of the data character in the line, default based on xxd output
    // byte_length            : Number of data bytes in the line
    // single_read_lines      : Specify the number of lines to be read: This is to limit the data array size
+   // little_endian          : Toggle this to swap endianness
+   // skip_endianness_conversion : Skips endiannesss conversion to avoid warning message
    // -----------------------------------------------------------------------------------------------
-   function new(string name, int skip_lines=0, int data_char_position=8, int bytes=4, int single_read_lines=100);
+   function new(string name, int skip_lines=0, int data_char_position=10, int bytes=4, int single_read_lines=100, bit little_endian=1, bit skip_endianness_conversion=0);
       file_name         = name;
       line_offset       = skip_lines;
       data_pos          = data_char_position;
       byte_len          = bytes;
       page_size         = single_read_lines;
+      endian            = ~little_endian;
+      convert_endian    = ~skip_endianness_conversion;
    endfunction
 
 
@@ -86,6 +93,45 @@ class stimulus_file#(type T=bit[7:0]);
 
 
    // -----------------------------------------------------------------------------------------------
+   // Endianness Conversion
+   // -----------------------------------------------------------------------------------------------
+   function byte_ar_t endianness_conversion(byte_ar_t in);
+      byte_ar_t    out;
+      bit[7:0]     word_count=1; // more than 8 words will be difficult to read from hex file
+
+      // Big Endian : Bytes already extracted in big endian way, so returning as is
+      if (endian) begin
+         return(in);
+      end
+
+      if (in.size % 4 != 0) begin
+         $display("Warning !! Data size in one line of hex file is non multiple of 4bytes, this cannot be handled in endianness conversion !!");
+         $display("Skipping Endiannes Covnversion.. either provide word aligned hex dump or set skip_endianness_conversion to avoid this warning");
+         return(in);
+      end
+
+      for (int i=0; i<in.size; i++) begin
+         if (i != 0 && i % 4 == 0) begin
+            if (word_count > 8) begin
+               $display("Warning !! Data size in one line of hex file is greater than 8 words!!");
+               $display("It is recommended to keep the size within 8 words for readability");
+            end
+            ++word_count;
+         end
+         
+         // Little Endian conversion
+         // in  : 0 1 2 3 4 5 6 7
+         // out : 3 2 1 0 7 6 5 4
+         if (!endian) begin
+            out.push_back(in[((word_count*4)-1)-(i%4)]);
+         end
+      end
+
+      return(out);
+   endfunction
+
+
+   // -----------------------------------------------------------------------------------------------
    // Read input data file, which is in hex format
    // Eg: hex line
    // 0000000 6c6c6548  >Hell<
@@ -111,6 +157,11 @@ class stimulus_file#(type T=bit[7:0]);
       // Found data bytes in the line
       for(int i=0; i<byte_len; i++) begin
         data.push_back(s.substr(i*2,i*2+1).atohex()); 
+      end
+
+      // Endianess
+      if (convert_endian) begin
+         data = endianness_conversion(data);
       end
 
       total_byte_count += byte_len;
@@ -170,7 +221,7 @@ class stimulus_file#(type T=bit[7:0]);
    // -----------------------------------------------------------------------------------------------
    // Read input data file, which is in hex format
    // -----------------------------------------------------------------------------------------------
-   function byte_ar_t get_input_byte_stream(int size, int byte_offset=0);
+   function byte_ar_t get_input_byte_stream(int size);
       int               lines;
       byte_ar_t         data_ret;
       string            msg;

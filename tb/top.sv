@@ -62,6 +62,24 @@ module top;
      sd.print_array_hex(data, "1st_data");
      sd.print_array_ascii(data, "1st_data");
 
+     // Reading from 4 Byte hex file
+     sd = new(.name("../user_data_from_file/input/file_4B.hex"), .little_endian(0));
+
+     len = 40;
+     data = sd.get_input_byte_stream(len);
+     $display("Asked %d bytes", len);
+     sd.print_array_hex(data, "1st_data");
+     sd.print_array_ascii(data, "1st_data");
+
+     // Reading from 4 Byte hex file
+     sd = new("../user_data_from_file/input/file_4B.hex");
+
+     len = 40;
+     data = sd.get_input_byte_stream(len);
+     $display("Asked %d bytes", len);
+     sd.print_array_hex(data, "1st_data");
+     sd.print_array_ascii(data, "1st_data");
+
      len = 40;
      data = sd.get_input_byte_stream(len);
      $display("Asked %d bytes", len);
@@ -73,6 +91,9 @@ module top;
      $display("Asked %d bytes", len);
      sd.print_array_hex(data, "3rd_data");
      sd.print_array_ascii(data, "3rd_data");
+
+
+     
 
      // Reading from 8 Byte hex file with skip of 2 lines
      sd = new("../user_data_from_file/input/file_8B.hex", .skip_lines(2), .bytes(8));
