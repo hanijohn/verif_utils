@@ -94,6 +94,8 @@ Below code has the complete use model
 ```
 
 ## Simulation
+[edaplayground](https://edaplayground.com/x/tDaT)
+
 Experimental run requires VCS and can be done by executing below commands
 
 ```csh
