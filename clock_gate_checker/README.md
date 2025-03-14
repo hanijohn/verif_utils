@@ -52,3 +52,13 @@ Clock checks are terminated by invoking `check` with `TERMINATE`. This kills all
     // Terminate all clock checks
     u_clk_chkr.check(u_clk_chkr.TERMINATE);
 ```
+
+## Simulation
+[edaplayground](https://edaplayground.com/x/rRnM)
+
+Experimental run requires VCS and can be done by executing below commands
+
+```csh
+cd run
+make all TOP=top_clock_gate_checker
+```
