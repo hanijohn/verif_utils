@@ -138,6 +138,7 @@ module top;
      sd_B.print_array_hex(sd_B.receive_data, "receive data");
 
      
+     $display("Test Completed");
      
   end
 
