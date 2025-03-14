@@ -4,7 +4,7 @@ Verification utilities that should help with Pre-Silicon Testbench development a
 1. [User Data from File](./user_data_from_file/README.md)
 At the start of the verification process, before scoreboards are established, a fixed incremental data pattern is often used as a stimulus for the design. This approach aids in debugging if any issues arise. The data typically consists of a stream of bytes, which can become complex when multiple streams, channels, or ports require unique identifiers within the pattern. 
 
-![image info](./Drawing.png)
+![Text file to/from DUT](./user_data_from_file/Drawing.png)
 The `User Data From File` verification utility simplifies this process by allowing users to input a text file as the stimulus for the design.
 Users can create or provide a text or log file as input to the design, and the output can similarly be converted into a human-readable format.
 
