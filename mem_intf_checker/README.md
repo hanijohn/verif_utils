@@ -1,5 +1,5 @@
 # Memory Interface Checker
-This checker is to validate the read data matches to the written data to the memory. Two types of memory checkers are given here
+This checker is designed to ensure that the read data matches the data written to the memory. Two types of memory checkers are provided here.
 
 ## Dual Port RAM checker
 In Dual Port RAMs, there are distinct interfaces for writing and reading operations. Data written is stored in the internal memory, while for reading, the data retrieved from the interface is verified against the internal memory. The checker is designed as a parameterized interface to accommodate different address and data widths.
