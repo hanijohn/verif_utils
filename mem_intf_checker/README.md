@@ -21,42 +21,6 @@ In Dual Port RAMs, there are distinct interfaces for writing and reading operati
                                                                                                );
 ```
 
-### APIs
-1. Read Delay cycle
-   Provide the number of cycles for Read Data. 
-   The default setting is 2
-   ```verilog
-      u_dpram_checker.rd_delay_cycle = 3;
-   ```
-1. Input sample delay
-   Provide the delay to sample input signals.
-   The default setting is 1 timeunit
-   ```verilog
-      u_dpram_checker.input_sample_delay = 10;
-   ```
-1. Increased verbosity
-   Prints the data matching accesses.
-   The default setting is 0
-   ```verilog
-      u_dpram_checker.verbose = 1;
-   ```
-1. Checks unknown value on interface signals
-   The default setting is 0.
-   ```verilog
-      u_dpram_checker.check_any_unknown = 1;
-   ```
-1. Memory already Initialized
-   Indicate whether the memory model has already been initialized. If the memory model was initialized, the data read from unwritten locations should not be unknown.
-   The default setting is 0.
-   ```verilog
-      u_dpram_checker.mem_initialized = 1;
-   ```
-1. Delete after Read
-   Erase memory data after it is read. This action will help decrease memory usage during simulation. 
-   The default setting is 0.
-   ```verilog
-      u_dpram_checker.delete_data_after_read = 1;
-   ```
 
 ## Single Port RAM checker
 Single port RAM operates on the same interface for both writes and reads. The checker is designed as a parameterized interface to accommodate different address and data widths.

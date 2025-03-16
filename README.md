@@ -8,5 +8,8 @@ Verification utilities that should help with Pre-Silicon Testbench development a
 
    The `User Data From File` verification utility simplifies this process by allowing users to input a text file as the stimulus for the design. Users can create or provide a text or log file as input to the design, and the output can similarly be converted into a human-readable format.
 
-2. [Clock Gate Checker](./clock_gate_checker/README.md)  
+1. [Clock Gate Checker](./clock_gate_checker/README.md)  
    A generic clock gate checker that can scale to accommodate any number of clocks. Once the clock gates are activated, the checker monitors for any toggling of the clocks and reports such occurrences as errors.
+
+1. [Memory Interface Checker](./mem_intf_checker/README.md)  
+   A generic memory interface checker that can support any address or data width. Checkers are implemented for Single and Dual port RAMs with configurable read latencies.
